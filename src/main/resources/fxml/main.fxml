@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.microbob.MainApplication">
+    <children>
+        <HBox alignment="CENTER_RIGHT" onMouseDragged="#onMouseDragged" onMousePressed="#onMousePressed" prefHeight="30.0">
+            <children>
+                <Button fx:id="minimizeBtn" mnemonicParsing="false" onAction="#onMinimize" prefHeight="30.0" prefWidth="45.0"
+                        styleClass="minimize-btn"/>
+                <Button fx:id="maximizeBtn" mnemonicParsing="false" onAction="#onMaximize" prefHeight="30.0" prefWidth="45.0"
+                        styleClass="maximize-btn"/>
+                <Button fx:id="closeBtn" mnemonicParsing="false" onAction="#onClose" prefHeight="30.0" prefWidth="45.0"
+                        styleClass="close-btn"/>
+            </children>
+        </HBox>
+        <SplitPane dividerPositions="0.85" prefWidth="1000.0" VBox.vgrow="ALWAYS">
+            <items>
+                <TableView fx:id="serverTV" prefWidth="200.0">
+                    <columns>
+                        <TableColumn fx:id="iconTC" maxWidth="1.7976931348623157E308" minWidth="45.0" prefWidth="150.0"/>
+                        <TableColumn fx:id="serverTC" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="175.0" text="Server"/>
+                        <TableColumn fx:id="webappsTC" maxWidth="1.7976931348623157E308" minWidth="375.0" prefWidth="375.0" text="Webapps"/>
+                        <TableColumn fx:id="statusTC" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="100.0" text="Status"/>
+                        <TableColumn fx:id="aktionTC" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="100.0"
+                                     sortable="false" text="Aktion"/>
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                </TableView>
+                <VBox prefWidth="328.0" spacing="10">
+                    <padding>
+                        <Insets bottom="10" left="15" right="15" top="10"/>
+                    </padding>
+                    <children>
+                        <Button fx:id="erfassenBtn" mnemonicParsing="false" onAction="#onErfassen" text="Erfassen"/>
+                        <Button fx:id="bearbeitenBtn" mnemonicParsing="false" onAction="#onBearbeiten" text="Bearbeiten"/>
+                        <Button fx:id="konfigurierenBtn" mnemonicParsing="false" onAction="#onKonfigurieren" text="Konfigurieren"/>
+                        <Button fx:id="inExplorerBtn" mnemonicParsing="false" onAction="#onInExplorer" text="In Explorer"/>
+                        <Button fx:id="loeschenBtn" mnemonicParsing="false" onAction="#onLoeschen" text="Löschen"/>
+                    </children>
+                </VBox>
+            </items>
+        </SplitPane>
+    </children>
+</VBox>
