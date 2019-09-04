@@ -11,8 +11,8 @@ import com.jcraft.jsch.UserInfo;
 import de.microbob.constant.OperationSystem;
 import de.microbob.constant.ServerStatus;
 import de.microbob.constant.ServerTyp;
-import de.microbob.controller.ErfassenController;
-import de.microbob.controller.KonfigurierenController;
+import de.microbob.controller.ConfigureController;
+import de.microbob.controller.CreateController;
 import de.microbob.exception.NotImplementedException;
 import de.microbob.model.Server;
 import javafx.application.Application;
@@ -86,25 +86,26 @@ public class MainApplication extends Application {
 
     private static Map<Server, Session> sessionForServer = new HashMap<>();
 
-    @FXML
-    public Button minimizeBtn;
+    //        For Custom Titlebar
+//    @FXML
+//    public Button minimizeBtn;
+//
+//    @FXML
+//    public Button maximizeBtn;
+//
+//    @FXML
+//    public Button closeBtn;
 
     @FXML
-    public Button maximizeBtn;
-
+    public Button createBtn;
     @FXML
-    public Button closeBtn;
-
+    public Button editBtn;
     @FXML
-    public Button erfassenBtn;
-    @FXML
-    public Button bearbeitenBtn;
-    @FXML
-    public Button konfigurierenBtn;
+    public Button configureBtn;
     @FXML
     public Button inExplorerBtn;
     @FXML
-    public Button loeschenBtn;
+    public Button deleteBtn;
 
     @FXML
     private TableView<Server> serverTV;
@@ -122,7 +123,7 @@ public class MainApplication extends Application {
     private TableColumn<Server, String> statusTC;
 
     @FXML
-    private TableColumn<Server, String> aktionTC;
+    private TableColumn<Server, String> actionTC;
 
     private static ObservableList<Server> servers;
 
@@ -142,8 +143,8 @@ public class MainApplication extends Application {
         }
 
 
-        primaryStage.setTitle("Servermanagerment - ChJ");
-        primaryStage.initStyle(StageStyle.UNDECORATED);
+        primaryStage.setTitle("Servermanagerment");
+//        primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.setScene(mainScene);
         primaryStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("images/main_icon.png")));
         primaryStage.show();
@@ -154,18 +155,20 @@ public class MainApplication extends Application {
         Gson gson = new Gson();
 
         servers.stream()
-                .filter(s -> s.getPasswort() != null)
-                .forEach(s -> s.setPasswort(new String(Base64.getEncoder().encode(s.getPasswort().getBytes()))));
+                .filter(s -> s.getPassword() != null)
+                .forEach(s -> s.setPassword(new String(Base64.getEncoder().encode(s.getPassword().getBytes()))));
         String jsonString = gson.toJson(servers);
 
         //Sessions beenden
         sessionForServer.values().forEach(Session::disconnect);
 
         //json-Datei aktualisieren
-        Files.deleteIfExists(PATH_TO_INPUT);
+        if (jsonString != null && !jsonString.isEmpty()) {
+            Files.deleteIfExists(PATH_TO_INPUT);
 
-        try (BufferedWriter output = new BufferedWriter(new FileWriter(PATH_TO_INPUT.toFile()))) {
-            output.write(jsonString);
+            try (BufferedWriter output = new BufferedWriter(new FileWriter(PATH_TO_INPUT.toFile()))) {
+                output.write(jsonString);
+            }
         }
     }
 
@@ -192,32 +195,35 @@ public class MainApplication extends Application {
 
                 if (persitedServers != null) {
                     persitedServers.stream()
-                            .filter(s -> s.getPasswort() != null)
-                            .forEach(s -> s.setPasswort(new String(Base64.getDecoder().decode(s.getPasswort().getBytes()))));
+                            .filter(s -> s.getPassword() != null)
+                            .forEach(s -> s.setPassword(new String(Base64.getDecoder().decode(s.getPassword().getBytes()))));
                     servers = FXCollections.observableList(persitedServers);
-                } else {
-                    servers = FXCollections.observableList(new ArrayList<>());
                 }
             }
+        }
+
+        if (servers == null) {
+            servers = FXCollections.observableList(new ArrayList<>());
         }
     }
 
     @FXML
     public void initialize() {
-        ImageView minimizeIcon = new ImageView(new Image(getClass().getClassLoader().getResource("images/minimize.png").toString()));
-        minimizeIcon.setFitHeight(30);
-        minimizeIcon.setFitWidth(45);
-        minimizeBtn.setGraphic(minimizeIcon);
-
-        ImageView maximizeIcon = new ImageView(new Image(getClass().getClassLoader().getResource("images/maximize.png").toString()));
-        maximizeIcon.setFitHeight(30);
-        maximizeIcon.setFitWidth(45);
-        maximizeBtn.setGraphic(maximizeIcon);
-
-        ImageView closeIcon = new ImageView(new Image(getClass().getClassLoader().getResource("images/close.png").toString()));
-        closeIcon.setFitHeight(30);
-        closeIcon.setFitWidth(45);
-        closeBtn.setGraphic(closeIcon);
+//        For Custom Titlebar
+//        ImageView minimizeIcon = new ImageView(new Image(getClass().getClassLoader().getResource("images/minimize.png").toString()));
+//        minimizeIcon.setFitHeight(30);
+//        minimizeIcon.setFitWidth(45);
+//        minimizeBtn.setGraphic(minimizeIcon);
+//
+//        ImageView maximizeIcon = new ImageView(new Image(getClass().getClassLoader().getResource("images/maximize.png").toString()));
+//        maximizeIcon.setFitHeight(30);
+//        maximizeIcon.setFitWidth(45);
+//        maximizeBtn.setGraphic(maximizeIcon);
+//
+//        ImageView closeIcon = new ImageView(new Image(getClass().getClassLoader().getResource("images/close.png").toString()));
+//        closeIcon.setFitHeight(30);
+//        closeIcon.setFitWidth(45);
+//        closeBtn.setGraphic(closeIcon);
 
         statusTC.getStyleClass().add("status-column");
 
@@ -260,7 +266,7 @@ public class MainApplication extends Application {
                                                 if (selectedServer.isLocal()) {
                                                     urlStringBuiler.append("localhost");
                                                 } else {
-                                                    urlStringBuiler.append(selectedServer.getPfad());
+                                                    urlStringBuiler.append(selectedServer.getPath());
                                                 }
 
                                                 String urlWebapp = webappWithoutKomma.equalsIgnoreCase("ROOT") ? "" : webappWithoutKomma;
@@ -320,7 +326,7 @@ public class MainApplication extends Application {
                                                     break;
                                             }
 
-                                            setText(status.getAnzeigename());
+                                            setText(status.getDisplayname());
                                         }
                                     }
                                 }
@@ -389,7 +395,7 @@ public class MainApplication extends Application {
                     }
                 };
 
-        aktionTC.setCellFactory(aktionCellFactory);
+        actionTC.setCellFactory(aktionCellFactory);
 
         Callback<TableColumn<Server, ImageView>, TableCell<Server, ImageView>> iconCellFactory = new Callback<TableColumn<Server, ImageView>, TableCell<Server, ImageView>>() {
             @Override
@@ -415,7 +421,7 @@ public class MainApplication extends Application {
                                         iconUrl = getClass().getClassLoader().getResource("images/apache-tomcat-icon.png");
                                         break;
                                     case WILDFLY:
-                                        iconUrl = getClass().getClassLoader().getResource("images/wildfly_icon.png");
+                                        //                                        iconUrl = getClass().getClassLoader().getResource("images/wildfly_icon.png");
                                         break;
                                 }
 
@@ -449,14 +455,12 @@ public class MainApplication extends Application {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Server rowData = row.getItem();
-                    System.out.println("Row clicked: " + rowData.getName());
                     handleActionForServer(rowData);
                 }
             });
             row.setOnKeyReleased(event -> {
                 if (KeyCode.SPACE == event.getCode() && !row.isEmpty()) {
                     Server rowData = row.getItem();
-                    System.out.println("Row clicked: " + rowData.getName());
                     handleActionForServer(rowData);
                 }
             });
@@ -477,9 +481,9 @@ public class MainApplication extends Application {
     }
 
     private void startServer(Server server) {
-        String pfadToServer = server.getPfad();
+        String pathToServer = server.getPath();
         System.out.println("Starting Server " + server.getName()
-                + "   " + pfadToServer);
+                + "   " + pathToServer);
 
         if (server.isLocal()) {
             startLocalServer(server);
@@ -493,9 +497,9 @@ public class MainApplication extends Application {
     }
 
     private void stopServer(Server server) {
-        String pfadToServer = server.getPfad();
+        String pathToServer = server.getPath();
         System.out.println("Stopping Server " + server.getName()
-                + "   " + pfadToServer);
+                + "   " + pathToServer);
 
         if (server.isLocal()) {
             stopLocalServer(server);
@@ -517,24 +521,24 @@ public class MainApplication extends Application {
     }
 
     @FXML
-    void onErfassen(ActionEvent event) throws IOException {
+    void onCreate(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getClassLoader().getResource("fxml/erfassen.fxml"));
         VBox root = loader.load();
 
-        ErfassenController erfassenController = loader.getController();
-        erfassenController.setMainApplication(this);
+        CreateController createController = loader.getController();
+        createController.setMainApplication(this);
 
-        Stage stage = showNewWindow(root, "Server erfassen");
+        Stage stage = showNewWindow(root, "Create server");
 
-        erfassenController.setStage(stage);
+        createController.setStage(stage);
 
         stage.showAndWait();
         Platform.runLater(() -> serverTV.refresh());
     }
 
     @FXML
-    void onBearbeiten(ActionEvent event) throws IOException {
+    void onEdit(ActionEvent event) throws IOException {
         Optional<Server> toEdit = getSelectedServer();
 
         if (toEdit.isPresent()) {
@@ -542,13 +546,13 @@ public class MainApplication extends Application {
             loader.setLocation(getClass().getClassLoader().getResource("fxml/erfassen.fxml"));
             VBox root = loader.load();
 
-            ErfassenController erfassenController = loader.getController();
-            erfassenController.setMainApplication(this);
+            CreateController createController = loader.getController();
+            createController.setMainApplication(this);
 
-            Stage stage = showNewWindow(root, "Server erfassen");
+            Stage stage = showNewWindow(root, "Edit server");
 
-            erfassenController.setStage(stage);
-            erfassenController.setServerToEdit(toEdit.get());
+            createController.setStage(stage);
+            createController.setServerToEdit(toEdit.get());
 
             stage.showAndWait();
             Platform.runLater(() -> serverTV.refresh());
@@ -556,15 +560,16 @@ public class MainApplication extends Application {
     }
 
     @FXML
-    void onLoeschen(ActionEvent event) {
+    void onDelete(ActionEvent event) {
 
-        ButtonType buttonTypeJa = new ButtonType("Ja", ButtonBar.ButtonData.OK_DONE);
-        ButtonType buttonTypeNein = new ButtonType("Nein", ButtonBar.ButtonData.CANCEL_CLOSE);
-        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION, "Möchten Sie den Server wirklich aus der Übersicht löschen?",
+        ButtonType buttonTypeJa = new ButtonType("Yes", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeNein = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure about deleting the server?",
                 buttonTypeJa, buttonTypeNein);
         ((Stage) confirmDialog.getDialogPane().getScene().getWindow()).getIcons()
                 .add(new Image(getClass().getClassLoader().getResourceAsStream("images/main_icon.png")));
-        confirmDialog.setHeaderText("Löschen von Server");
+        confirmDialog.setTitle("Confirmation");
+        confirmDialog.setHeaderText("Deleting Server");
         confirmDialog.getDialogPane().getStylesheets().add("css/main_dark.css");
 
         Optional<ButtonType> buttonType = confirmDialog.showAndWait();
@@ -588,30 +593,30 @@ public class MainApplication extends Application {
 
             if (server.isLocal()) {
                 try {
-                    Path pathToServer = Paths.get(server.getPfad());
+                    Path pathToServer = Paths.get(server.getPath());
 
                     if (Files.exists(pathToServer)) {
                         Desktop.getDesktop().open(pathToServer.toFile());
                     } else {
-                        Alert alertUrl = new Alert(Alert.AlertType.ERROR, "Das Verzeichnis des Servers existiert nicht!");
+                        Alert alertUrl = new Alert(Alert.AlertType.ERROR, "The directory of the server does not exist!");
                         ((Stage) alertUrl.getDialogPane().getScene().getWindow()).getIcons()
                                 .add(new Image(getClass().getClassLoader().getResourceAsStream("images/main_icon.png")));
-                        alertUrl.setTitle("Fehlerhafter Pfad");
+                        alertUrl.setTitle("Error in Path");
                         alertUrl.getDialogPane().getStylesheets().add("css/main_dark.css");
                         alertUrl.showAndWait();
                     }
                 } catch (InvalidPathException e) {
-                    Alert alertUrl = new Alert(Alert.AlertType.ERROR, "Der Server hat einen ung\u00FCltigen Pfad hinterlegt!");
+                    Alert alertUrl = new Alert(Alert.AlertType.ERROR, "The configured path of the server is invalid");
                     ((Stage) alertUrl.getDialogPane().getScene().getWindow()).getIcons()
                             .add(new Image(getClass().getClassLoader().getResourceAsStream("images/main_icon.png")));
-                    alertUrl.setTitle("Fehlerhafter Pfad");
+                    alertUrl.setTitle("Error in Path");
                     alertUrl.getDialogPane().getStylesheets().add("css/main_dark.css");
                     alertUrl.showAndWait();
                 } catch (IOException e) {
-                    Alert alertUrl = new Alert(Alert.AlertType.ERROR, "Der Pfad des Servers konnte nicht ge\u00F6ffnet werden!");
+                    Alert alertUrl = new Alert(Alert.AlertType.ERROR, "The configured path of the server could not be opened");
                     ((Stage) alertUrl.getDialogPane().getScene().getWindow()).getIcons()
                             .add(new Image(getClass().getClassLoader().getResourceAsStream("images/main_icon.png")));
-                    alertUrl.setTitle("Fehlerhafter Pfad");
+                    alertUrl.setTitle("Error in Path");
                     alertUrl.getDialogPane().getStylesheets().add("css/main_dark.css");
                     alertUrl.showAndWait();
                 }
@@ -641,7 +646,7 @@ public class MainApplication extends Application {
     }
 
     @FXML
-    void onKonfigurieren(ActionEvent event) throws IOException {
+    void onConfigure(ActionEvent event) throws IOException {
         Optional<Server> selectedServer = getSelectedServer();
 
         if (selectedServer.isPresent()) {
@@ -650,9 +655,9 @@ public class MainApplication extends Application {
                 loader.setLocation(getClass().getClassLoader().getResource("fxml/konfigurieren.fxml"));
                 VBox root = loader.load();
 
-                KonfigurierenController konfigurierenController = loader.getController();
+                ConfigureController konfigurierenController = loader.getController();
                 konfigurierenController.setMainController(this);
-                konfigurierenController.setServerInKonf(selectedServer.get());
+                konfigurierenController.setServerInConfig(selectedServer.get());
 
                 Stage stage = showNewWindow(root, "Konfigurationsdatei ausw\u00E4hlen");
                 stage.show();
@@ -663,7 +668,7 @@ public class MainApplication extends Application {
     }
 
     private void startLocalServer(Server selectedServer) {
-        String pfadToServer = selectedServer.getPfad();
+        String pfadToServer = selectedServer.getPath();
         ServerTyp typ = selectedServer.getTyp();
         switch (typ) {
             case TOMCAT:
@@ -682,7 +687,7 @@ public class MainApplication extends Application {
     }
 
     private void stopLocalServer(Server selectedServer) {
-        String pfadToServer = selectedServer.getPfad();
+        String pfadToServer = selectedServer.getPath();
         ServerTyp typ = selectedServer.getTyp();
         switch (typ) {
             case TOMCAT:
@@ -731,7 +736,7 @@ public class MainApplication extends Application {
             if (oUsernameAndPassword.isPresent()) {
                 Pair<String, String> usernameAndPassword = oUsernameAndPassword.get();
 
-                session = jSch.getSession(usernameAndPassword.getKey(), selectedServer.getPfad(), 22);
+                session = jSch.getSession(usernameAndPassword.getKey(), selectedServer.getPath(), 22);
                 session.setPassword(usernameAndPassword.getValue());
                 session.setUserInfo(new FxUserInfo());
                 session.connect();
@@ -754,7 +759,7 @@ public class MainApplication extends Application {
                             //                            command = selectedServer.getRemotePfad() + "/bin/shutdown.bat";
                             //                            break;
                         case UNIX:
-                            command = selectedServer.getRemotePfad() + "/bin/startup.sh";
+                            command = selectedServer.getRemotePath() + "/bin/startup.sh";
                             break;
                     }
                     break;
@@ -781,7 +786,7 @@ public class MainApplication extends Application {
             if (oUsernameAndPassword.isPresent()) {
                 Pair<String, String> usernameAndPassword = oUsernameAndPassword.get();
 
-                session = jSch.getSession(usernameAndPassword.getKey(), selectedServer.getPfad(), 22);
+                session = jSch.getSession(usernameAndPassword.getKey(), selectedServer.getPath(), 22);
                 session.setPassword(usernameAndPassword.getValue());
                 FxUserInfo userinfo = new FxUserInfo();
                 session.setUserInfo(userinfo);
@@ -804,7 +809,7 @@ public class MainApplication extends Application {
                             //                            command = selectedServer.getRemotePfad() + "/bin/shutdown.bat";
                             //                            break;
                         case UNIX:
-                            command = selectedServer.getRemotePfad() + "/bin/shutdown.sh";
+                            command = selectedServer.getRemotePath() + "/bin/shutdown.sh";
                             break;
                     }
                     break;
@@ -853,7 +858,7 @@ public class MainApplication extends Application {
     public static Optional<Pair<String, String>> getUsernameAndPassword(Server selectedServer) {
         Pair<String, String> resultPair = null;
 
-        String serverUser = selectedServer.getBenutzer();
+        String serverUser = selectedServer.getUser();
 
         String username;
         if (serverUser != null) {
@@ -861,22 +866,22 @@ public class MainApplication extends Application {
         } else {
             TextInputDialog inputDialog = new TextInputDialog();
 
-            inputDialog.setTitle("Benutzer");
-            inputDialog.setContentText("Bitte geben Sie einen Benutzernamen an");
+            inputDialog.setTitle("User");
+            inputDialog.setContentText("Enter a username please");
             Optional<String> oHost = inputDialog.showAndWait();
             username = oHost.orElse(null);
         }
 
         if (username != null) {
 
-            String passwort = selectedServer.getPasswort();
+            String passwort = selectedServer.getPassword();
 
             if (passwort == null || passwort.isEmpty()) {
-                Dialog<String> passwordDialog = createPasswordDialog("Bitte geben Sie ein Passwort ein");
+                Dialog<String> passwordDialog = createPasswordDialog("Enter a password please");
 
                 Optional<String> oPasswort = passwordDialog.showAndWait();
                 if (oPasswort.isPresent()) {
-                    selectedServer.setPasswort(oPasswort.get());
+                    selectedServer.setPassword(oPasswort.get());
                     resultPair = new Pair<>(username, oPasswort.get());
                 }
             } else {
@@ -891,7 +896,7 @@ public class MainApplication extends Application {
         Dialog<String> passwordDialog = new Dialog<>();
         ((Stage) passwordDialog.getDialogPane().getScene().getWindow()).getIcons()
                 .add(new Image(MainApplication.class.getClassLoader().getResourceAsStream("images/main_icon.png")));
-        passwordDialog.setTitle("Passwort");
+        passwordDialog.setTitle("Password");
         passwordDialog.setHeaderText(message);
         passwordDialog.getDialogPane().getStylesheets().add("css/main_dark.css");
 
@@ -927,13 +932,13 @@ public class MainApplication extends Application {
     }
 
     private Stage showNewWindow(VBox root, String title) {
-        Scene erfassenScene = new Scene(root);
+        Scene sceneToShow = new Scene(root);
         if (darktheme) {
-            erfassenScene.getStylesheets().add("css/main_dark.css");
+            sceneToShow.getStylesheets().add("css/main_dark.css");
         }
         Stage stage = new Stage();
         stage.setTitle(title);
-        stage.setScene(erfassenScene);
+        stage.setScene(sceneToShow);
         stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("images/main_icon.png")));
 
         return stage;
@@ -957,10 +962,10 @@ public class MainApplication extends Application {
             ((Stage) eingabeDialog.getDialogPane().getScene().getWindow()).getIcons()
                     .add(new Image(getClass().getClassLoader().getResourceAsStream("images/main_icon.png")));
             eingabeDialog.getDialogPane().getStylesheets().add("css/main_dark.css");
-            eingabeDialog.setTitle("Eingabe");
+            eingabeDialog.setTitle("Input");
 
             ButtonType okType = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
-            ButtonType cancelType = new ButtonType("Abbrechen", ButtonBar.ButtonData.CANCEL_CLOSE);
+            ButtonType cancelType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
             eingabeDialog.getDialogPane().getButtonTypes().addAll(okType, cancelType);
 
             eingabeDialog.setHeaderText(destination + ": " + name);
@@ -1050,7 +1055,7 @@ public class MainApplication extends Application {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             ((Stage) alert.getDialogPane().getScene().getWindow()).getIcons()
                     .add(new Image(getClass().getClassLoader().getResourceAsStream("images/main_icon.png")));
-            alert.setTitle("Meldung");
+            alert.setTitle("Information");
             alert.setHeaderText(null);
             alert.setContentText(message);
             alert.getDialogPane().getStylesheets().add("css/main_dark.css");
@@ -1060,58 +1065,60 @@ public class MainApplication extends Application {
 
     }
 
-    @FXML
-    void onClose(ActionEvent event) {
-        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        stage.close();
-    }
-
-    @FXML
-    void onMaximize(ActionEvent event) {
-        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        stage.setMaximized(!stage.isMaximized());
-
-        if (stage.isMaximized()) {
-            ImageView nonMaximizeIcon = new ImageView(new Image(getClass().getClassLoader().getResource("images/nonMaximize.png").toString()));
-            nonMaximizeIcon.setFitHeight(30);
-            nonMaximizeIcon.setFitWidth(45);
-            maximizeBtn.setGraphic(nonMaximizeIcon);
-        } else {
-            ImageView maximizeIcon = new ImageView(new Image(getClass().getClassLoader().getResource("images/maximize.png").toString()));
-            maximizeIcon.setFitHeight(30);
-            maximizeIcon.setFitWidth(45);
-            maximizeBtn.setGraphic(maximizeIcon);
-        }
-    }
-
-    @FXML
-    void onMinimize(ActionEvent event) {
-        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        stage.setIconified(!stage.isIconified());
-    }
-
-    final Delta dragDelta = new Delta();
-
-    @FXML
-    void onMousePressed(MouseEvent mouseEvent) {
-        Stage stage = (Stage) erfassenBtn.getScene().getWindow();
-
-        dragDelta.x = stage.getX() - mouseEvent.getScreenX();
-        dragDelta.y = stage.getY() - mouseEvent.getScreenY();
-    }
-
-    @FXML
-    void onMouseDragged(MouseEvent mouseEvent) {
-        Stage stage = (Stage) erfassenBtn.getScene().getWindow();
-
-        stage.setX(mouseEvent.getScreenX() + dragDelta.x);
-        stage.setY(mouseEvent.getScreenY() + dragDelta.y);
-    }
-
-    // records relative x and y co-ordinates.
-    class Delta {
-        double x, y;
-    }
+    //For custom titlebar
+//    @FXML
+//    void onClose(ActionEvent event) {
+//        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+//        stage.close();
+//    }
+//
+//    @FXML
+//    void onMaximize(ActionEvent event) {
+//        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+//        stage.setMaximized(!stage.isMaximized());
+//
+//        if (stage.isMaximized()) {
+//            ImageView nonMaximizeIcon = new ImageView(
+//                    new Image(getClass().getClassLoader().getResource("images/nonMaximize.png").toString()));
+//            nonMaximizeIcon.setFitHeight(30);
+//            nonMaximizeIcon.setFitWidth(45);
+//            maximizeBtn.setGraphic(nonMaximizeIcon);
+//        } else {
+//            ImageView maximizeIcon = new ImageView(new Image(getClass().getClassLoader().getResource("images/maximize.png").toString()));
+//            maximizeIcon.setFitHeight(30);
+//            maximizeIcon.setFitWidth(45);
+//            maximizeBtn.setGraphic(maximizeIcon);
+//        }
+//    }
+//
+//    @FXML
+//    void onMinimize(ActionEvent event) {
+//        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+//        stage.setIconified(!stage.isIconified());
+//    }
+//
+//    final Delta dragDelta = new Delta();
+//
+//    @FXML
+//    void onMousePressed(MouseEvent mouseEvent) {
+//        Stage stage = (Stage) createBtn.getScene().getWindow();
+//
+//        dragDelta.x = stage.getX() - mouseEvent.getScreenX();
+//        dragDelta.y = stage.getY() - mouseEvent.getScreenY();
+//    }
+//
+//    @FXML
+//    void onMouseDragged(MouseEvent mouseEvent) {
+//        Stage stage = (Stage) createBtn.getScene().getWindow();
+//
+//        stage.setX(mouseEvent.getScreenX() + dragDelta.x);
+//        stage.setY(mouseEvent.getScreenY() + dragDelta.y);
+//    }
+//
+//    // records relative x and y co-ordinates.
+//    class Delta {
+//        double x, y;
+//    }
 
     static class JSCHLogger implements com.jcraft.jsch.Logger {
 

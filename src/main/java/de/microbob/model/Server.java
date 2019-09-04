@@ -7,15 +7,15 @@ import de.microbob.constant.ServerTyp;
 public class Server {
 
     private String name;
-    private String pfad;
+    private String path;
     private String port;
 
     private ServerTyp typ;
 
-    private String benutzer;
+    private String user;
 
-    private String passwort;
-    private String remotePfad;
+    private String password;
+    private String remotePath;
     private OperationSystem operationSystem;
 
     private transient ServerStatus status;
@@ -32,12 +32,12 @@ public class Server {
         this.name = name;
     }
 
-    public String getPfad() {
-        return pfad;
+    public String getPath() {
+        return path;
     }
 
-    public void setPfad(String pfad) {
-        this.pfad = pfad;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public ServerTyp getTyp() {
@@ -80,28 +80,28 @@ public class Server {
         this.webapps = webapps;
     }
 
-    public String getBenutzer() {
-        return benutzer;
+    public String getUser() {
+        return user;
     }
 
-    public void setBenutzer(String benutzer) {
-        this.benutzer = benutzer;
+    public void setUser(String user) {
+        this.user = user;
     }
 
-    public String getPasswort() {
-        return passwort;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswort(String passwort) {
-        this.passwort = passwort;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public String getRemotePfad() {
-        return remotePfad;
+    public String getRemotePath() {
+        return remotePath;
     }
 
-    public void setRemotePfad(String remotePfad) {
-        this.remotePfad = remotePfad;
+    public void setRemotePath(String remotePath) {
+        this.remotePath = remotePath;
     }
 
     public OperationSystem getOperationSystem() {

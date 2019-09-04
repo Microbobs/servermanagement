@@ -1,6 +1,6 @@
 package de.microbob.controller;
 
-import de.microbob.model.KonfigurationsDatei;
+import de.microbob.model.ConfigurationFile;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
@@ -16,12 +16,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class EditierenController {
+public class FileEditController {
 
     @FXML
     private TextArea editTA;
 
-    private KonfigurationsDatei dateiToEdit;
+    private ConfigurationFile fileToEdit;
 
     @FXML
     void initialize() {
@@ -29,10 +29,10 @@ public class EditierenController {
 
     @FXML
     void onSpeichern(ActionEvent event) throws IOException {
-        Files.deleteIfExists(Paths.get(dateiToEdit.getAbsoulterPfad()));
+        Files.deleteIfExists(Paths.get(fileToEdit.getAbsoultePath()));
 
-        File absoulterPfad = new File(dateiToEdit.getAbsoulterPfad());
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(absoulterPfad, false))) {
+        File absoultePath = new File(fileToEdit.getAbsoultePath());
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(absoultePath, false))) {
             String newContent = editTA.getText();
             writer.write(newContent);
         }
@@ -40,15 +40,15 @@ public class EditierenController {
         ((Stage) editTA.getScene().getWindow()).close();
     }
 
-    public KonfigurationsDatei getDateiToEdit() {
-        return dateiToEdit;
+    public ConfigurationFile getFileToEdit() {
+        return fileToEdit;
     }
 
-    public void setDateiToEdit(KonfigurationsDatei dateiToEdit) {
-        this.dateiToEdit = dateiToEdit;
+    public void setFileToEdit(ConfigurationFile fileToEdit) {
+        this.fileToEdit = fileToEdit;
 
         StringBuilder fileContent = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new FileReader(dateiToEdit.getAbsoulterPfad()))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileToEdit.getAbsoultePath()))) {
             reader.lines().forEach(l -> {
                 fileContent.append(l);
                 fileContent.append("\n");

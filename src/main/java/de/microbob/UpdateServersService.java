@@ -69,7 +69,7 @@ public class UpdateServersService extends ScheduledService<Void> {
         if (port != null) {
             try {
                 Socket socket = new Socket();
-                String hostname = server.isLocal() ? "127.0.0.1" : server.getPfad();
+                String hostname = server.isLocal() ? "127.0.0.1" : server.getPath();
                 socket.connect(new InetSocketAddress(hostname, Integer.parseInt(port)), 500);
                 status = ServerStatus.RUNNING;
             } catch (IOException e) {
@@ -87,10 +87,10 @@ public class UpdateServersService extends ScheduledService<Void> {
 
             switch (server.getTyp()) {
                 case TOMCAT:
-                    pathToWebappsDir = Paths.get(server.getPfad(), "/webapps");
+                    pathToWebappsDir = Paths.get(server.getPath(), "/webapps");
                     break;
                 case WILDFLY:
-                    pathToWebappsDir = Paths.get(server.getPfad(), "/standalone/deployments");
+                    pathToWebappsDir = Paths.get(server.getPath(), "/standalone/deployments");
                     break;
             }
 
@@ -108,10 +108,10 @@ public class UpdateServersService extends ScheduledService<Void> {
             if (session == null || !session.isConnected()) {
                 JSch jSch = new JSch();
 
-                String username = server.getBenutzer();
-                String password = server.getPasswort();
+                String username = server.getUser();
+                String password = server.getPassword();
 
-                session = jSch.getSession(username, server.getPfad(), 22);
+                session = jSch.getSession(username, server.getPath(), 22);
                 session.setPassword(password);
                 session.setUserInfo(new MainApplication.FxUserInfo());
                 session.connect();
@@ -132,7 +132,7 @@ public class UpdateServersService extends ScheduledService<Void> {
                             //TODO
                             throw new NotImplementedException();
                         case UNIX:
-                            command = "ls -d " + Paths.get(server.getRemotePfad(), "/webapps").toString().replaceAll("\\\\", "/") + "/*/";
+                            command = "ls -d " + Paths.get(server.getRemotePath(), "/webapps").toString().replaceAll("\\\\", "/") + "/*/";
                             unix = true;
                             break;
                     }
@@ -143,7 +143,7 @@ public class UpdateServersService extends ScheduledService<Void> {
                             //TODO
                             throw new NotImplementedException();
                         case UNIX:
-                            command = "ls -d " + Paths.get(server.getRemotePfad(), "/standalone/deployments").toString()
+                            command = "ls -d " + Paths.get(server.getRemotePath(), "/standalone/deployments").toString()
                                     .replaceAll("\\\\", "/") + "/*/";
                             unix = true;
                             break;

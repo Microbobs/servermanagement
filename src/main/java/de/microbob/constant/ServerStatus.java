@@ -1,24 +1,24 @@
 package de.microbob.constant;
 
 public enum ServerStatus {
-    UNKNOWN("Unbekannt"), RUNNING("L\u00E4uft"), STOPPED("Gestoppt");
+    UNKNOWN("Unknown"), RUNNING("Running"), STOPPED("Stopped");
 
-    private String anzeigename;
+    private String displayname;
 
-    ServerStatus(String anzeigename) {
-        this.anzeigename = anzeigename;
+    ServerStatus(String displayname) {
+        this.displayname = displayname;
     }
 
-    public String getAnzeigename() {
-        return anzeigename;
+    public String getDisplayname() {
+        return displayname;
     }
 
-    public void setAnzeigename(String anzeigename) {
-        this.anzeigename = anzeigename;
+    public void setDisplayname(String displayname) {
+        this.displayname = displayname;
     }
 
     @Override
     public String toString() {
-        return anzeigename;
+        return displayname;
     }
 }

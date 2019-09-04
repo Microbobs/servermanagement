@@ -27,16 +27,16 @@ import java.util.List;
 
 import static de.microbob.MainApplication.*;
 
-public class ErfassenController {
+public class CreateController {
 
     public static final String LABELTEXT_HOST = "Host";
-    private static final String LABELTEXT_PFAD = "Pfad";
+    private static final String LABELTEXT_PATH = "Path";
 
     @FXML
-    private VBox erfassenVB;
+    private VBox createVB;
 
     @FXML
-    private Button durchsuchenBtn;
+    private Button filesearchBtn;
 
     @FXML
     private ChoiceBox<ServerTyp> typCB;
@@ -45,10 +45,10 @@ public class ErfassenController {
     private CheckBox remoteCB;
 
     @FXML
-    private Label pfadLabel;
+    private Label pathLabel;
 
     @FXML
-    private TextField pfadTF;
+    private TextField pathTF;
 
     @FXML
     private TextField nameTF;
@@ -57,22 +57,22 @@ public class ErfassenController {
     private TextField portTF;
 
     @FXML
-    private HBox benutzerHB;
+    private HBox userHB;
 
     @FXML
-    private TextField benutzerTF;
+    private TextField userTF;
 
     @FXML
-    private HBox passwortHB;
+    private HBox passwordHB;
 
     @FXML
-    private PasswordField passwortPF;
+    private PasswordField passwordPF;
 
     @FXML
-    private HBox remotePfadHB;
+    private HBox remotePathHB;
 
     @FXML
-    private TextField remotePfadTF;
+    private TextField remotePathTF;
 
     private MainApplication mainApplication;
     private Stage stage;
@@ -89,35 +89,35 @@ public class ErfassenController {
             }
         });
 
-        erfassenVB.getChildren().remove(benutzerHB);
-        erfassenVB.getChildren().remove(passwortHB);
-        erfassenVB.getChildren().remove(remotePfadHB);
+        createVB.getChildren().remove(userHB);
+        createVB.getChildren().remove(passwordHB);
+        createVB.getChildren().remove(remotePathHB);
     }
 
     @FXML
-    void onDurchsuchen(ActionEvent event) {
+    void onFileSearch(ActionEvent event) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         File directory = directoryChooser.showDialog(stage);
         if (directory != null) {
-            pfadTF.setText(directory.getAbsolutePath());
+            pathTF.setText(directory.getAbsolutePath());
         }
     }
 
     @FXML
-    void onSpeichern(ActionEvent event) {
+    void onSave(ActionEvent event) {
         String name = nameTF.getText();
-        String pfad = pfadTF.getText();
+        String path = pathTF.getText();
         String port = portTF.getText();
-        String benutzer = benutzerTF.getText();
-        String passwort = passwortPF.getText();
-        String remotePfad = remotePfadTF.getText();
+        String user = userTF.getText();
+        String password = passwordPF.getText();
+        String remotePath = remotePathTF.getText();
         ServerTyp typ = typCB.getValue();
 
         boolean baseFieldsFilled =
-                name != null && !name.isEmpty() && pfad != null && !pfad.isEmpty() && typ != null && port != null && !port.isEmpty();
+                name != null && !name.isEmpty() && path != null && !path.isEmpty() && typ != null && port != null && !port.isEmpty();
         boolean remoteFieldsFilled =
-                (remoteCB.isSelected() && benutzer != null && !benutzer.isEmpty() && passwort != null && !passwort.isEmpty()
-                        && remotePfad != null && !remotePfad.isEmpty()) || !remoteCB.isSelected();
+                (remoteCB.isSelected() && user != null && !user.isEmpty() && password != null && !password.isEmpty()
+                        && remotePath != null && !remotePath.isEmpty()) || !remoteCB.isSelected();
         if (baseFieldsFilled && remoteFieldsFilled) {
             Server server;
 
@@ -130,17 +130,17 @@ public class ErfassenController {
                 server = serverInEdit;
             }
             server.setName(name);
-            server.setPfad(pfad);
+            server.setPath(path);
             server.setPort(port);
             server.setLocal(!remoteCB.isSelected());
             server.setTyp(typ);
             if (remoteCB.isSelected()) {
-                server.setBenutzer(benutzer);
-                server.setPasswort(passwort);
-                server.setRemotePfad(remotePfad);
+                server.setUser(user);
+                server.setPassword(password);
+                server.setRemotePath(remotePath);
 
                 OperationSystem os = OperationSystem.WIN;
-                if (remotePfad != null && remotePfad.startsWith("/")) {
+                if (remotePath != null && remotePath.startsWith("/")) {
                     os = OperationSystem.UNIX;
                 }
                 server.setOperationSystem(os);
@@ -166,25 +166,25 @@ public class ErfassenController {
     void onRemote(ActionEvent event) {
         boolean remote = remoteCB.isSelected();
 
-        ObservableList<Node> vbChildren = erfassenVB.getChildren();
+        ObservableList<Node> vbChildren = createVB.getChildren();
         if (remote) {
-            pfadLabel.setText(LABELTEXT_HOST);
-            durchsuchenBtn.setVisible(false);
+            pathLabel.setText(LABELTEXT_HOST);
+            filesearchBtn.setVisible(false);
 
-            if (!vbChildren.contains(benutzerHB)) {
-                vbChildren.add(4, benutzerHB);
-                vbChildren.add(5, passwortHB);
-                vbChildren.add(6, remotePfadHB);
+            if (!vbChildren.contains(userHB)) {
+                vbChildren.add(4, userHB);
+                vbChildren.add(5, passwordHB);
+                vbChildren.add(6, remotePathHB);
             }
         } else {
-            pfadLabel.setText(LABELTEXT_PFAD);
-            durchsuchenBtn.setVisible(true);
+            pathLabel.setText(LABELTEXT_PATH);
+            filesearchBtn.setVisible(true);
 
-            vbChildren.remove(benutzerHB);
-            vbChildren.remove(passwortHB);
-            vbChildren.remove(remotePfadHB);
+            vbChildren.remove(userHB);
+            vbChildren.remove(passwordHB);
+            vbChildren.remove(remotePathHB);
         }
-        erfassenVB.autosize();
+        createVB.autosize();
         stage.sizeToScene();
     }
 
@@ -192,16 +192,16 @@ public class ErfassenController {
         serverInEdit = server;
 
         nameTF.setText(server.getName());
-        pfadTF.setText(server.getPfad());
+        pathTF.setText(server.getPath());
         portTF.setText(server.getPort());
         typCB.setValue(server.getTyp());
         if (server.isLocal()) {
             remoteCB.setSelected(false);
         } else {
             remoteCB.setSelected(true);
-            remotePfadTF.setText(server.getRemotePfad());
-            benutzerTF.setText(server.getBenutzer());
-            passwortPF.setText(server.getPasswort());
+            remotePathTF.setText(server.getRemotePath());
+            userTF.setText(server.getUser());
+            passwordPF.setText(server.getPassword());
         }
         onRemote(null);
     }

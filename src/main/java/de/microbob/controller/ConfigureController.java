@@ -2,7 +2,7 @@ package de.microbob.controller;
 
 import de.microbob.MainApplication;
 import de.microbob.constant.ServerTyp;
-import de.microbob.model.KonfigurationsDatei;
+import de.microbob.model.ConfigurationFile;
 import de.microbob.model.Server;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,16 +22,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class KonfigurierenController {
+public class ConfigureController {
 
     @FXML
-    private Button auswaehlenBtn;
+    private Button chooseBtn;
 
     @FXML
-    private ListView<String> konfigurationLV;
+    private ListView<String> configurationLV;
 
-    private Server serverInKonf;
-    private List<KonfigurationsDatei> konfigurationsDateien;
+    private Server serverInConfig;
+    private List<ConfigurationFile> configurationFiles;
 
     private MainApplication mainApplication;
 
@@ -41,20 +41,20 @@ public class KonfigurierenController {
     }
 
     @FXML
-    void onAuswaehlen(ActionEvent event) throws IOException {
-        ObservableList<String> selectedItems = konfigurationLV.getSelectionModel().getSelectedItems();
+    void onChoose(ActionEvent event) throws IOException {
+        ObservableList<String> selectedItems = configurationLV.getSelectionModel().getSelectedItems();
 
         if (selectedItems != null && selectedItems.size() == 1) {
             String selectedFilename = selectedItems.get(0);
 
-            List<KonfigurationsDatei> selectedKonfigurationsdateien = konfigurationsDateien.stream()
-                    .filter(k -> selectedFilename.equals(k.getDateiname()))
+            List<ConfigurationFile> selectedKonfigurationsdateien = configurationFiles.stream()
+                    .filter(k -> selectedFilename.equals(k.getFilename()))
                     .collect(Collectors.toList());
 
             if (selectedKonfigurationsdateien.size() == 1) {
-                KonfigurationsDatei konfigurationsDatei = selectedKonfigurationsdateien.get(0);
+                ConfigurationFile configurationFile = selectedKonfigurationsdateien.get(0);
 
-                mainApplication.getHostServices().showDocument(konfigurationsDatei.getAbsoulterPfad());
+                mainApplication.getHostServices().showDocument(configurationFile.getAbsoultePath());
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte w\u00E4hlen Sie genau eine Datei aus.");
@@ -67,11 +67,11 @@ public class KonfigurierenController {
 
     }
 
-    public void setServerInKonf(Server serverInKonf) {
-        this.serverInKonf = serverInKonf;
+    public void setServerInConfig(Server serverInConfig) {
+        this.serverInConfig = serverInConfig;
 
-        Path serverPath = Paths.get(serverInKonf.getPfad());
-        ServerTyp typ = serverInKonf.getTyp();
+        Path serverPath = Paths.get(serverInConfig.getPath());
+        ServerTyp typ = serverInConfig.getTyp();
 
         if (Files.exists(serverPath)) {
             List<Path> directoriesToSearch = new ArrayList<>();
@@ -85,7 +85,7 @@ public class KonfigurierenController {
                     break;
             }
 
-            konfigurationsDateien = new ArrayList<>();
+            configurationFiles = new ArrayList<>();
 
             try {
                 for (Path toSearch : directoriesToSearch) {
@@ -98,8 +98,8 @@ public class KonfigurierenController {
                                         || pathString.endsWith(".xml");
                             })
                             .peek(System.out::println)
-                            .forEach(p -> konfigurationsDateien
-                                    .add(new KonfigurationsDatei(p.getFileName().toString(), p.toAbsolutePath().toString())));
+                            .forEach(p -> configurationFiles
+                                    .add(new ConfigurationFile(p.getFileName().toString(), p.toAbsolutePath().toString())));
 
                 }
             } catch (IOException e) {
@@ -107,9 +107,9 @@ public class KonfigurierenController {
             }
 
             ObservableList<String> listViewElements = FXCollections.observableList(new ArrayList<>());
-            konfigurationsDateien.forEach(k -> listViewElements.add(k.getDateiname()));
+            configurationFiles.forEach(k -> listViewElements.add(k.getFilename()));
 
-            konfigurationLV.setItems(listViewElements);
+            configurationLV.setItems(listViewElements);
         }
     }
 

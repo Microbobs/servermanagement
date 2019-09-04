@@ -10,12 +10,12 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<VBox fx:id="erfassenVB" prefHeight="250.0" prefWidth="450.0" spacing="30.0" xmlns="http://javafx.com/javafx/8.0.171"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.microbob.controller.ErfassenController" styleClass="erfassen-root">
+<VBox fx:id="createVB" prefHeight="250.0" prefWidth="450.0" spacing="30.0" xmlns="http://javafx.com/javafx/8.0.171"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.microbob.controller.CreateController" styleClass="erfassen-root">
     <children>
         <HBox spacing="10.0">
             <children>
-                <CheckBox fx:id="remoteCB" mnemonicParsing="false" onAction="#onRemote" text=" Remote Server"/>
+                <CheckBox fx:id="remoteCB" mnemonicParsing="false" onAction="#onRemote" text="Remote Server"/>
             </children>
             <VBox.margin>
                 <Insets/>
@@ -23,50 +23,50 @@
         </HBox>
         <HBox spacing="10.0">
             <children>
-                <Label prefWidth="50.0" text="Name"/>
+                <Label prefWidth="60.0" text="Name"/>
                 <TextField fx:id="nameTF"/>
             </children>
         </HBox>
         <HBox spacing="10.0">
             <children>
-                <Label fx:id="pfadLabel" prefWidth="50.0" text="Pfad"/>
-                <TextField fx:id="pfadTF"/>
-                <Button fx:id="durchsuchenBtn" mnemonicParsing="false" onAction="#onDurchsuchen" text="Durchsuchen"/>
+                <Label fx:id="pathLabel" prefWidth="60.0" text="Path"/>
+                <TextField fx:id="pathTF"/>
+                <Button fx:id="filesearchBtn" mnemonicParsing="false" onAction="#onFileSearch" text="Choose"/>
             </children>
         </HBox>
         <HBox spacing="10.0">
             <children>
-                <Label prefWidth="50.0" text="Port"/>
+                <Label prefWidth="60.0" text="Port"/>
                 <TextField fx:id="portTF"/>
             </children>
         </HBox>
-        <HBox fx:id="benutzerHB" spacing="10.0">
+        <HBox fx:id="userHB" spacing="10.0">
             <children>
-                <Label prefWidth="50.0" text="Benutzer"/>
-                <TextField fx:id="benutzerTF"/>
+                <Label prefWidth="60.0" text="Username"/>
+                <TextField fx:id="userTF"/>
             </children>
         </HBox>
-        <HBox fx:id="passwortHB" spacing="10.0">
+        <HBox fx:id="passwordHB" spacing="10.0">
             <children>
-                <Label prefWidth="50.0" text="Passwort"/>
-                <PasswordField fx:id="passwortPF"/>
+                <Label prefWidth="60.0" text="Password"/>
+                <PasswordField fx:id="passwordPF"/>
             </children>
         </HBox>
-        <HBox fx:id="remotePfadHB" spacing="10.0">
+        <HBox fx:id="remotePathHB" spacing="10.0">
             <children>
-                <Label prefWidth="50.0" text="Pfad"/>
-                <TextField fx:id="remotePfadTF"/>
+                <Label prefWidth="60.0" text="Path"/>
+                <TextField fx:id="remotePathTF"/>
             </children>
         </HBox>
         <HBox spacing="10.0">
             <children>
-                <Label prefWidth="50.0" text="Typ"/>
+                <Label prefWidth="60.0" text="Typ"/>
                 <ChoiceBox fx:id="typCB" prefWidth="150.0"/>
             </children>
         </HBox>
         <AnchorPane prefHeight="53.0" prefWidth="450.0">
             <children>
-                <Button alignment="CENTER" mnemonicParsing="false" onAction="#onSpeichern" text="Speichern" AnchorPane.bottomAnchor="10.0"
+                <Button alignment="CENTER" mnemonicParsing="false" onAction="#onSave" text="Save" AnchorPane.bottomAnchor="10.0"
                         AnchorPane.rightAnchor="20.0"/>
             </children>
         </AnchorPane>
