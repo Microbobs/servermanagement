@@ -143,7 +143,7 @@ public class MainApplication extends Application {
         }
 
 
-        primaryStage.setTitle("Servermanagerment");
+        primaryStage.setTitle("Servermanagement");
 //        primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.setScene(mainScene);
         primaryStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("images/main_icon.png")));
