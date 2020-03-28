@@ -70,9 +70,6 @@
                     <appName>Servermanagement</appName>
                     <vendor>Microbobs</vendor>
                     <bundler>EXE</bundler>
-                    <bundleArguments>
-                        <runtime />
-                    </bundleArguments>
                 </configuration>
                 <executions>
                     <execution>
